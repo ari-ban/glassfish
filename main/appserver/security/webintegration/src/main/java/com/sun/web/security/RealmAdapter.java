@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -67,13 +67,11 @@ import javax.security.auth.message.AuthStatus;
 import javax.security.auth.message.MessageInfo;
 import javax.security.auth.message.config.ServerAuthConfig;
 import javax.security.auth.message.config.ServerAuthContext;
+import javax.security.auth.x500.X500Principal;
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import sun.security.x509.X500Name;
-
 import org.apache.catalina.Authenticator;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -682,8 +680,8 @@ public class RealmAdapter extends RealmBase implements RealmInitializer, PostCon
             if (certs != null) {
                 Subject subject = new Subject();
                 X509Certificate certificate = certs[0];
-                X500Name x500Name = (X500Name) certificate.getSubjectDN();
-                subject.getPublicCredentials().add(x500Name);
+                X500Principal x500Principal = certificate.getSubjectX500Principal();
+                subject.getPublicCredentials().add(x500Principal);
                 // Put the certificate chain as an List in the subject, to be accessed by user's LoginModule.
                 final List<X509Certificate> certificateCred = Arrays.asList(certs);
                 subject.getPublicCredentials().add(certificateCred);

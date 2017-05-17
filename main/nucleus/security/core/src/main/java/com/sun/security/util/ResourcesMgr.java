@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -38,43 +38,50 @@
  * holder.
  */
 
-package com.sun.enterprise.iiop.security;
-
-import com.sun.enterprise.common.iiop.security.GSSUtilsContract;
-import java.io.IOException;
-
-import org.jvnet.hk2.annotations.Service;
-import javax.inject.Singleton;
-import com.sun.security.util.ObjectIdentifier;
+package com.sun.security.util;
 
 /**
- *
- * @author Kumar
  */
-@Service
-@Singleton
-public class GSSUtilsService implements GSSUtilsContract {
+//This class is copied from sun.security.util.ResourcesMgr as this is a JDK internal class
+//and not accessible in JDK9
+public class ResourcesMgr {
 
-    public String dumpHex(byte[] octets) {
-        return GSSUtils.dumpHex(octets);
+  // intended for java.security, javax.security and sun.security resources
+  private static java.util.ResourceBundle bundle;
+
+  // intended for com.sun.security resources
+  private static java.util.ResourceBundle altBundle;
+
+  public static String getString(String s) {
+
+    if (bundle == null) {
+
+      // only load if/when needed
+      bundle = java.security.AccessController.doPrivileged(
+              new java.security.PrivilegedAction<java.util.ResourceBundle>() {
+                public java.util.ResourceBundle run() {
+                  return (java.util.ResourceBundle.getBundle
+                          ("sun.security.util.Resources"));
+                }
+              });
     }
 
-    public byte[] importName(ObjectIdentifier oid, byte[] externalName) throws IOException {
-        return GSSUtils.importName(oid, externalName);
+    return bundle.getString(s);
+  }
+
+  public static String getString(String s, final String altBundleName) {
+
+    if (altBundle == null) {
+
+      // only load if/when needed
+      altBundle = java.security.AccessController.doPrivileged(
+              new java.security.PrivilegedAction<java.util.ResourceBundle>() {
+                public java.util.ResourceBundle run() {
+                  return (java.util.ResourceBundle.getBundle(altBundleName));
+                }
+              });
     }
 
-    public byte[] createExportedName(ObjectIdentifier oid, byte[] extName) throws IOException {
-        return GSSUtils.createExportedName(oid, extName);
-    }
-
-    public ObjectIdentifier GSSUP_MECH_OID() {
-        return GSSUtils.GSSUP_MECH_OID;
-    }
-    /**
-     * TODO:V3 temporarily putting it inside this contract
-     * @return the ORB
-    public Object getORB() {
-        
-    }*/
-
+    return altBundle.getString(s);
+  }
 }

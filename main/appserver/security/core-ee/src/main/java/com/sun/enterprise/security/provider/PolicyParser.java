@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -50,9 +50,10 @@ import java.text.MessageFormat;
 import javax.security.auth.x500.X500Principal;
 
 import java.security.GeneralSecurityException;
-import sun.security.util.Debug;
-import sun.security.util.PropertyExpander;
-import sun.security.util.ResourcesMgr;
+import com.sun.security.util.Debug;
+import com.sun.security.util.PropertyExpander;
+import com.sun.security.util.ResourcesMgr;
+import com.sun.enterprise.util.ParseUtil;
 
 /**
  * The policy for a Java runtime (specifying
@@ -668,7 +669,7 @@ public class PolicyParser {
 	    dirs = new String[count];
 	    for (int i = 0; i < count; i++) {
 		File file = new File(st.nextToken());
-		dirs[i] = sun.net.www.ParseUtil.encodePath
+		dirs[i] = ParseUtil.encodePath
 			(file.getAbsolutePath());
 
 		if (!dirs[i].startsWith("/")) {

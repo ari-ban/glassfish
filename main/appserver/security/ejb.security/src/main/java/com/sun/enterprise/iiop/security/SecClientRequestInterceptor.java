@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -64,9 +64,9 @@ import org.glassfish.enterprise.iiop.api.GlassFishORBHelper;
 import org.omg.CORBA.*;
 import org.omg.PortableInterceptor.*;
 import org.omg.IOP.*;
-import sun.security.util.DerOutputStream;
-import sun.security.util.DerValue;
-import sun.security.x509.X500Name;
+import com.sun.security.util.DerOutputStream;
+import com.sun.security.util.DerValue;
+import javax.security.auth.x500.X500Principal;
 
 /**
  * This class implements a client side security request interceptor for CSIV2.
@@ -190,11 +190,10 @@ public class SecClientRequestInterceptor extends    org.omg.CORBA.LocalObject
         Any  any = orb.create_any();
         idtok = new IdentityToken();
   
-        if (X500Name.class.isAssignableFrom(cls)) {
+        if (X500Principal.class.isAssignableFrom(cls)) {
                 _logger.log(Level.FINE,"Constructing an X500 DN Identity Token");
-            X500Name credname = (X500Name) cred;
-            credname.encode(dos);  // ASN.1 encoding
-            X501DistinguishedNameHelper.insert(any, dos.toByteArray());
+          X500Principal credname = (X500Principal) cred;
+            X501DistinguishedNameHelper.insert(any, credname.getEncoded());
 
             /* IdentityToken with CDR encoded X501 name */
             idtok.dn(codec.encode_value(any)); 

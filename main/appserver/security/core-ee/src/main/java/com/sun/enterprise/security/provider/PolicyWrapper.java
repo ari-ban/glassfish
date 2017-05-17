@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -50,6 +50,9 @@
 
 package com.sun.enterprise.security.provider;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.Policy;
+
 /**
  * This class is a wrapper around the default jdk policy file 
  * implementation. PolicyWrapper is installed as the JRE policy object
@@ -72,7 +75,13 @@ public class PolicyWrapper extends BasePolicyWrapper {
      */
     @Override
     protected java.security.Policy getNewPolicy() {
-	return (java.security.Policy) new sun.security.provider.PolicyFile();
+      Policy p;
+      try {
+        p=Policy.getInstance("JavaPolicy", null);
+      } catch (NoSuchAlgorithmException e) {
+        throw new RuntimeException("NoSuchAlgorithmException in time of creating a policy",e);
+      }
+      return p;
     }
 }
 

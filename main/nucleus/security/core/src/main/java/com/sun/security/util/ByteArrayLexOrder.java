@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -38,43 +38,47 @@
  * holder.
  */
 
-package com.sun.enterprise.iiop.security;
 
-import com.sun.enterprise.common.iiop.security.GSSUtilsContract;
-import java.io.IOException;
+package com.sun.security.util;
 
-import org.jvnet.hk2.annotations.Service;
-import javax.inject.Singleton;
-import com.sun.security.util.ObjectIdentifier;
+import java.util.Comparator;
 
 /**
+ * Compare two byte arrays in lexicographical order.
  *
- * @author Kumar
+ * @author D. N. Hoover
  */
-@Service
-@Singleton
-public class GSSUtilsService implements GSSUtilsContract {
+//This class is copied from sun.security.util.ByteArrayLexOrder as this is a JDK internal class
+//and not accessible in JDK9
+public class ByteArrayLexOrder implements Comparator<byte[]> {
 
-    public String dumpHex(byte[] octets) {
-        return GSSUtils.dumpHex(octets);
-    }
-
-    public byte[] importName(ObjectIdentifier oid, byte[] externalName) throws IOException {
-        return GSSUtils.importName(oid, externalName);
-    }
-
-    public byte[] createExportedName(ObjectIdentifier oid, byte[] extName) throws IOException {
-        return GSSUtils.createExportedName(oid, extName);
-    }
-
-    public ObjectIdentifier GSSUP_MECH_OID() {
-        return GSSUtils.GSSUP_MECH_OID;
-    }
     /**
-     * TODO:V3 temporarily putting it inside this contract
-     * @return the ORB
-    public Object getORB() {
-        
-    }*/
+     * Perform lexicographical comparison of two byte arrays,
+     * regarding each byte as unsigned.  That is, compare array entries
+     * in order until they differ--the array with the smaller entry
+     * is "smaller". If array entries are
+     * equal till one array ends, then the longer array is "bigger".
+     *
+     * @param  bytes1 first byte array to compare.
+     * @param  bytes2 second byte array to compare.
+     * @return negative number if bytes1 < bytes2, 0 if bytes1 == bytes2,
+     * positive number if bytes1 > bytes2.
+     *
+     * @exception <code>ClassCastException</code>
+     * if either argument is not a byte array.
+     */
+    public final int compare( byte[] bytes1, byte[] bytes2) {
+        int diff;
+        for (int i = 0; i < bytes1.length && i < bytes2.length; i++) {
+            diff = (bytes1[i] & 0xFF) - (bytes2[i] & 0xFF);
+            if (diff != 0) {
+                return diff;
+            }
+        }
+        // if array entries are equal till the first ends, then the
+        // longer is "bigger"
+        return bytes1.length - bytes2.length;
+    }
+
 
 }

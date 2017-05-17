@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -57,10 +57,11 @@ import com.sun.enterprise.security.auth.realm.InvalidOperationException;
 import com.sun.enterprise.security.auth.realm.IASRealm;
 import java.security.Principal;
 import javax.security.auth.callback.Callback;
+import javax.security.auth.x500.X500Principal;
 
 
 import org.jvnet.hk2.annotations.Service;
-import sun.security.x509.X500Name;
+
 
 
 /**
@@ -280,16 +281,16 @@ public final class CertificateRealm extends IASRealm
      * the security context for the current user.
      *
      * @param subject The Subject object for the authentication request.
-     * @param x500name The X500Name object from the user certificate.
+     * @param x500name The X500Principal object from the user certificate.
      *
      */
-    public void authenticate(Subject subject, X500Name x500name)
+    public void authenticate(Subject subject, X500Principal x500name)
     {
         // It is important to use x500name.getName() in order to be
         // consistent with web containers view of the name - see bug
         // 4646134 for reasons why this matters.
         
-        String name = x500name.getName();
+        String name = x500name.getName("RFC1779");
 
         if (_logger.isLoggable(Level.FINEST)) {
             _logger.finest(

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2013-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,20 +40,21 @@
 
 package com.sun.enterprise.security.perms;
 
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.CodeSource;
+import java.security.NoSuchAlgorithmException;
+import java.security.URIParameter;
 import java.security.Permission;
 import java.security.AllPermission;
 import java.security.PermissionCollection;
-import java.security.Permissions;
+import java.security.Policy;
 import java.security.cert.Certificate;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -61,7 +62,6 @@ import java.io.IOException;
 
 import com.sun.logging.LogDomains;
 
-import sun.security.provider.PolicyFile;
 
 /**
  * 
@@ -316,7 +316,14 @@ public class SMGlobalPolicyUtil {
         if (logger.isLoggable(Level.FINE)){
             logger.fine("Loading policy from " + furl);
         }
-        PolicyFile pf = new PolicyFile(furl);
+        Policy pf = null;
+        try {
+            pf = Policy.getInstance("JavaPolicy", new URIParameter(furl.toURI()));
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("NoSuchAlgorithmException in time of creating a policy",e);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("URISyntaxException in time of creating a policy",e);
+        }
 
         CodeSource cs = new CodeSource(new URL(EJB_TYPE_CODESOURCE), (Certificate[])null ); 
         PermissionCollection pc = pf.getPermissions(cs);

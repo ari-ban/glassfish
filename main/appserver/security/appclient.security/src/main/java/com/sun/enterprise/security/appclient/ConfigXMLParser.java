@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -56,7 +56,7 @@ import com.sun.logging.LogDomains;
 import java.util.List;
 import javax.xml.bind.JAXBException;
 import org.glassfish.appclient.client.acc.config.*;
-import sun.security.util.PropertyExpander;
+import com.sun.security.util.PropertyExpander;
 import com.sun.enterprise.security.jmac.AuthMessagePolicy;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -174,7 +174,7 @@ public class ConfigXMLParser implements ConfigParser {
                             PropertyExpander.expand
                             (prop.getValue(),
                              false));
-            } catch (sun.security.util.PropertyExpander.ExpandException ee) {
+            } catch (com.sun.security.util.PropertyExpander.ExpandException ee) {
                 // log warning and give the provider a chance to 
                 // interpret value itself.
                 if (_logger.isLoggable(Level.WARNING)) {

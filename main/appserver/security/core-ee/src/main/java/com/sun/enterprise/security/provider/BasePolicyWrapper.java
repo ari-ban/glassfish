@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -49,9 +49,7 @@
  */
 
 package com.sun.enterprise.security.provider;
-
-//import sun.security.provider.PolicyFile;
-import sun.security.util.PropertyExpander;
+import com.sun.security.util.PropertyExpander;
 import java.security.*;
 import javax.security.jacc.*;
 import javax.management.MBeanPermission;
@@ -62,6 +60,7 @@ import java.util.Enumeration;
 import java.util.logging.*; 
 import com.sun.logging.LogDomains;
 import com.sun.enterprise.util.LocalStringManagerImpl;
+import com.sun.enterprise.util.ParseUtil;
 
 /**
  * This class is a wrapper around the default jdk policy file 
@@ -154,8 +153,14 @@ public class BasePolicyWrapper extends java.security.Policy {
     /** gets the underlying PolicyFile implementation
      * can be overridden by Subclass
      */
-    protected java.security.Policy getNewPolicy() {
-	return (java.security.Policy) new sun.security.provider.PolicyFile();
+    protected Policy getNewPolicy() {
+		Policy p;
+		try {
+			p=Policy.getInstance("JavaPolicy", null);
+		} catch (NoSuchAlgorithmException e) {
+			throw new RuntimeException("NoSuchAlgorithmException in time of creating a policy",e);
+		}
+		return p;
     }
 
     /**
@@ -566,7 +571,7 @@ public class BasePolicyWrapper extends java.security.Policy {
 				if ("file".equals(policy_url.getProtocol())) {
 				    path = policy_url.getFile().
 					replace('/', File.separatorChar);
-				    path = sun.net.www.ParseUtil.decode(path);
+				    path = ParseUtil.decode(path);
 				    policyFile = new File(path);
 				    found = policyFile.exists();
 				}
@@ -612,7 +617,7 @@ public class BasePolicyWrapper extends java.security.Policy {
 			if ("file".equals(policy_url.getProtocol())) {
 			    String path = policy_url.getFile().
 				replace('/', File.separatorChar);
-			    path = sun.net.www.ParseUtil.decode(path);
+			    path = ParseUtil.decode(path);
 			    File policyFile = new File(path);
 			    if (policyFile.exists()) {
 				sum += policyFile.lastModified();

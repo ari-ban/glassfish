@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -45,9 +45,9 @@ import java.net.*;
 import java.security.*;
 import java.util.Arrays;
 
-import sun.net.www.ParseUtil;
-import sun.security.util.Debug;
-import sun.security.util.Password;
+import com.sun.enterprise.util.ParseUtil;
+import com.sun.security.util.Debug;
+import com.sun.security.util.Password;
 
 
 /**

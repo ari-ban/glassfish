@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -78,7 +78,7 @@ import com.sun.corba.ee.spi.transport.SocketInfo;
 import com.sun.corba.ee.org.omg.CSIIOP.*;
 import org.ietf.jgss.Oid;
 import java.util.Enumeration;
-import sun.security.x509.X500Name;
+import javax.security.auth.x500.X500Principal;
 import com.sun.enterprise.security.SecurityServicesUtil;
 import com.sun.enterprise.security.auth.login.LoginContextDriver;
 import com.sun.enterprise.security.auth.login.common.LoginException;
@@ -947,8 +947,8 @@ localStrings.getLocalString("securitymechansimselector.runas_cannot_propagate_us
                 Object o = credIter.next();
                 if(o instanceof GSSUPName) {
                     ctx.identcls = GSSUPName.class;
-                } else if(o instanceof X500Name) {
-                    ctx.identcls = X500Name.class;
+                } else if(o instanceof X500Principal) {
+                    ctx.identcls = X500Principal.class;
                 } else {
                     ctx.identcls = X509CertificateCredential.class;
                 }
@@ -1528,12 +1528,12 @@ as_context_mech
                 return null;
             }  else {
                 // Set the transport principal in subject and
-                // return the X500Name class
+                // return the X500Principal class
                 ssc = new SecurityContext();
-                X500Name x500Name = (X500Name) certChain[0].getSubjectDN();
+                X500Principal x500Principal = certChain[0].getSubjectX500Principal();
                 ssc.subject = new Subject();
-                ssc.subject.getPublicCredentials().add(x500Name);
-                ssc.identcls = X500Name.class;
+                ssc.subject.getPublicCredentials().add(x500Principal);
+                ssc.identcls = X500Principal.class;
                 ssc.authcls = null;
                 return ssc;
             }

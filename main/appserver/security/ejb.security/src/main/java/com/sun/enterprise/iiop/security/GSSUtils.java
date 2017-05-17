@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -42,9 +42,9 @@ package com.sun.enterprise.iiop.security;
 
 import java.io.IOException;
 import java.io.InputStream;
-import sun.security.util.ObjectIdentifier;
-import sun.security.util.DerInputStream;
-import sun.security.util.DerOutputStream;
+import com.sun.security.util.ObjectIdentifier;
+import com.sun.security.util.DerInputStream;
+import com.sun.security.util.DerOutputStream;
 
 import com.sun.corba.ee.org.omg.GSSUP.GSSUPMechOID;
 import com.sun.corba.ee.org.omg.CSI.GSS_NT_Export_Name_OID;

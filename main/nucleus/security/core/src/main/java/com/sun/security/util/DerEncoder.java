@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -38,43 +38,27 @@
  * holder.
  */
 
-package com.sun.enterprise.iiop.security;
+package com.sun.security.util;
 
-import com.sun.enterprise.common.iiop.security.GSSUtilsContract;
 import java.io.IOException;
-
-import org.jvnet.hk2.annotations.Service;
-import javax.inject.Singleton;
-import com.sun.security.util.ObjectIdentifier;
+import java.io.OutputStream;
 
 /**
+ * Interface to an object that knows how to write its own DER
+ * encoding to an output stream.
  *
- * @author Kumar
+ * @author D. N. Hoover
  */
-@Service
-@Singleton
-public class GSSUtilsService implements GSSUtilsContract {
+//This class is copied from sun.security.util.DerEncoder as this is a JDK internal class
+//and not accessible in JDK9
+public interface DerEncoder {
 
-    public String dumpHex(byte[] octets) {
-        return GSSUtils.dumpHex(octets);
-    }
-
-    public byte[] importName(ObjectIdentifier oid, byte[] externalName) throws IOException {
-        return GSSUtils.importName(oid, externalName);
-    }
-
-    public byte[] createExportedName(ObjectIdentifier oid, byte[] extName) throws IOException {
-        return GSSUtils.createExportedName(oid, extName);
-    }
-
-    public ObjectIdentifier GSSUP_MECH_OID() {
-        return GSSUtils.GSSUP_MECH_OID;
-    }
     /**
-     * TODO:V3 temporarily putting it inside this contract
-     * @return the ORB
-    public Object getORB() {
-        
-    }*/
+     * DER encode this object and write the results to a stream.
+     *
+     * @param out  the stream on which the DER encoding is written.
+     */
+    public void derEncode(OutputStream out)
+        throws IOException;
 
 }

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -54,6 +54,8 @@ import org.omg.CORBA.*;
 import org.omg.PortableInterceptor.*;
 import org.omg.IOP.*;
 
+import java.io.ByteArrayInputStream;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
 /* Import classes generated from CSIV2 idl files */
@@ -62,11 +64,11 @@ import com.sun.corba.ee.spi.legacy.connection.Connection;
 import com.sun.corba.ee.spi.legacy.interceptor.RequestInfoExt;
 import com.sun.enterprise.common.iiop.security.AnonCredential;
 import com.sun.enterprise.common.iiop.security.GSSUPName;
-import sun.security.util.DerInputStream;
-import sun.security.util.DerValue;
+import com.sun.security.util.DerInputStream;
+import com.sun.security.util.DerValue;
 
 import sun.security.x509.X509CertImpl;
-import sun.security.x509.X500Name;
+import javax.security.auth.x500.X500Principal;
 import javax.security.auth.*;  
 
 import com.sun.enterprise.security.auth.login.common.PasswordCredential;
@@ -76,7 +78,7 @@ import com.sun.enterprise.util.LocalStringManagerImpl;
 
 import com.sun.logging.LogDomains;
 import java.net.Socket;
-import java.util.Hashtable;
+import java.util.*;
 import java.util.logging.*;
 import org.glassfish.enterprise.iiop.api.GlassFishORBHelper;
 
@@ -249,7 +251,7 @@ public class SecServerRequestInterceptor
             break;
 
         case ITTDistinguishedName.value:
-            /* Construct a X500Name */
+            /* Construct a X500Principal  */
 
             derenc = idtok.dn();
             /* Issue 5766: Decode CDR encoding if necessary */
@@ -260,15 +262,15 @@ public class SecServerRequestInterceptor
                 derenc = X501DistinguishedNameHelper.extract(any);
             }
             if(_logger.isLoggable(Level.FINE)){
-                _logger.log(Level.FINE,"Create an X500Name object from identity token");
+                _logger.log(Level.FINE,"Create an X500Principal  object from identity token");
             }
-            X500Name xname = new X500Name(derenc);
+          X500Principal  xprincipal = new X500Principal(derenc);
 	    if(_logger.isLoggable(Level.FINE)) {
-                _logger.log(Level.FINE,"Identity to be asserted is " + xname.toString());
-		_logger.log(Level.FINE,"Adding X500Name to subject's PublicCredentials");
+                _logger.log(Level.FINE,"Identity to be asserted is " + xprincipal.toString());
+		_logger.log(Level.FINE,"Adding X500Principal to subject's PublicCredentials");
 	    }
-            sc.subject.getPublicCredentials().add(xname);
-            sc.identcls = X500Name.class;
+            sc.subject.getPublicCredentials().add(xprincipal);
+            sc.identcls = X500Principal.class;
             break;
             
         case ITTX509CertChain.value:
@@ -285,41 +287,23 @@ public class SecServerRequestInterceptor
                 /* Extract DER encoding */
                 derenc = X509CertificateChainHelper.extract(any);
             }
-
-            DerInputStream din = new DerInputStream(derenc);
-
-            /** 
-             * Size specified for getSequence() is 1 and is just 
-             * used as a guess by the method getSequence().
-             */
-            DerValue[] derval = din.getSequence(1);
-            X509Certificate[] certchain = 
-                        new X509CertImpl[derval.length];
-            /**
-             * X509Certificate does not have a constructor which can
-             * be used to instantiate objects from DER encodings. So
-             * use X509CertImpl extends X509Cerificate and also implements
-             * DerEncoder interface. 
-             */
-            if(_logger.isLoggable(Level.FINE)){
-		_logger.log(Level.FINE,"Contents of X509 Certificate chain:");
-            }
-            for (int i = 0; i < certchain.length; i++) {
-                certchain[i] = new X509CertImpl(derval[i]);
-                if(_logger.isLoggable(Level.FINE)){
-                _logger.log(Level.FINE,"    " + certchain[i].getSubjectDN().getName());
-                }
-            }
-            if(_logger.isLoggable(Level.FINE)){
-                _logger.log(Level.FINE,"Creating a X509CertificateCredential object from certchain");
-            }
+            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+            Collection certchain = cf.generateCertificates(new ByteArrayInputStream(derenc));
             /**
              * The alias field in the X509CertificateCredential is currently ignored
              * by the RI. So it is set to "dummy".
              * 
              */
+
+            X509Certificate[] certchainArr=new X509Certificate[certchain.size()];
+            Iterator i = certchain.iterator();
+            int index=0;
+            while (i.hasNext()) {
+                certchainArr[index]=(X509Certificate)i.next();
+            }
+
             X509CertificateCredential cred = 
-                new X509CertificateCredential(certchain, certchain[0].getSubjectDN().getName(), "default");
+                new X509CertificateCredential(certchainArr, certchainArr[0].getSubjectDN().getName(), "default");
             if(_logger.isLoggable(Level.FINE)){
                 _logger.log(Level.FINE,"Adding X509CertificateCredential to subject's PublicCredentials");
             }

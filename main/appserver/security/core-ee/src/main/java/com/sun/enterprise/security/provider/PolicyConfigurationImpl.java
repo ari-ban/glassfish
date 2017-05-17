@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -68,6 +68,7 @@ import com.sun.enterprise.security.provider.PolicyParser.PermissionEntry;
 import com.sun.enterprise.security.provider.PolicyParser.PrincipalEntry;
 import org.glassfish.deployment.common.SecurityRoleMapper;
 import org.glassfish.deployment.common.SecurityRoleMapperFactory;
+import com.sun.enterprise.util.ParseUtil;
 
 /** 
  * Implementation of Jacc PolicyConfiguration Interface
@@ -795,7 +796,13 @@ public class PolicyConfigurationImpl implements PolicyConfiguration {
 	if (wrapper != null && wrapper instanceof BasePolicyWrapper) {
 	    return ((BasePolicyWrapper) wrapper).getNewPolicy();
 	} else {
-	    return new sun.security.provider.PolicyFile();
+		Policy p;
+		try {
+			p=Policy.getInstance("JavaPolicy", null);
+		} catch (NoSuchAlgorithmException e) {
+			throw new RuntimeException("NoSuchAlgorithmException in time of creating a policy",e);
+		}
+		return p;
 	} 
     }
 
@@ -867,7 +874,7 @@ public class PolicyConfigurationImpl implements PolicyConfiguration {
 		}
 
 		policyUrlValue = 
-		    sun.net.www.ParseUtil.fileToEncodedURL(new File(name)).toString();
+		    ParseUtil.fileToEncodedURL(new File(name)).toString();
 		if (fromFile && !remove) {
                     uncheckedPermissions = null;
                     rolePermissionsTable = null;

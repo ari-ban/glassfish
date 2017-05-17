@@ -2,7 +2,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2013-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -45,9 +45,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
-import java.security.CodeSource;
-import java.security.PermissionCollection;
+import java.security.*;
 import java.security.cert.Certificate;
 
 import javax.xml.stream.XMLStreamException;
@@ -55,7 +55,7 @@ import javax.xml.stream.XMLStreamException;
 import com.sun.enterprise.security.perms.SMGlobalPolicyUtil;
 import com.sun.enterprise.security.perms.XMLPermissionsHandler;
 
-import sun.security.provider.PolicyFile;
+
 
 public class PermissionsUtil {
 
@@ -142,8 +142,15 @@ public class PermissionsUtil {
     private static PermissionCollection getEEPolicyPermissions(URL fileUrl) throws IOException {
         
         //System.out.println("Loading policy from " + fileUrl);
-        PolicyFile pf = new PolicyFile(fileUrl);
-        
+        Policy pf = null;
+        try {
+            pf = Policy.getInstance("JavaPolicy", new URIParameter(fileUrl.toURI()));
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("NoSuchAlgorithmException in time of creating a policy",e);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("URISyntaxException in time of creating a policy",e);
+        }
+
         CodeSource cs = 
             new CodeSource(
                     new URL(SMGlobalPolicyUtil.CLIENT_TYPE_CODESOURCE), (Certificate[])null );
