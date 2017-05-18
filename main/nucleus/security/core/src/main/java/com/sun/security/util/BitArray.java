@@ -226,12 +226,6 @@ public class BitArray {
         return hashCode ^ length;
     }
 
-
-    public Object clone() {
-        return new BitArray(this);
-    }
-
-
     private static final byte[][] NYBBLE = {
             { (byte)'0',(byte)'0',(byte)'0',(byte)'0'},
             { (byte)'0',(byte)'0',(byte)'0',(byte)'1'},
